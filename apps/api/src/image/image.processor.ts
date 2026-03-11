@@ -5,6 +5,7 @@
  */
 
 import { Worker } from 'bullmq';
+import { Prisma } from '@prisma/client';
 import sharp from 'sharp';
 import { getBullConnection } from '../config/bull.config.js';
 import { getMinioClient, BUCKET_IMAGES } from '../config/minio.config.js';
@@ -71,7 +72,7 @@ const worker = new Worker<ImageProcessJobData>(
       where: { id: pageId },
       data: {
         storageKey: `${basePath}.webp`,
-        scrambleMetadata,
+        scrambleMetadata: scrambleMetadata ?? Prisma.JsonNull,
       },
     });
 

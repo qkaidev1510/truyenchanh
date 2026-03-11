@@ -14,7 +14,7 @@ export class CommentService {
   async findByManga(
     mangaSlug: string,
     cursor?: string,
-    limit = PAGINATION_DEFAULTS.COMMENT_LIMIT,
+    limit: number = PAGINATION_DEFAULTS.COMMENT_LIMIT,
   ) {
     const manga = await this.prisma.manga.findUnique({ where: { slug: mangaSlug } });
     if (!manga) throw new NotFoundException('Manga not found');

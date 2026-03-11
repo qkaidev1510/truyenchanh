@@ -50,7 +50,7 @@ export async function generateSignature(
   }
 
   // Node.js environment (dynamic import to avoid bundling issues in browser)
-  const { createHmac } = await import('node:crypto');
+  const { createHmac } = await import('crypto');
   return createHmac('sha256', secret).update(message).digest('hex');
 }
 
@@ -68,6 +68,6 @@ export function isTimestampValid(timestamp: number): boolean {
  * Node.js only — not meant for browser use.
  */
 export async function hashIp(ip: string): Promise<string> {
-  const { createHash } = await import('node:crypto');
+  const { createHash } = await import('crypto');
   return createHash('sha256').update(ip).digest('hex');
 }

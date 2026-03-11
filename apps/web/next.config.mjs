@@ -1,6 +1,5 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
@@ -23,6 +22,16 @@ const nextConfig: NextConfig = {
   },
   // Transpile workspace packages
   transpilePackages: ['@manga/ui', '@manga/shared', '@manga/wasm'],
+  webpack(config) {
+    config.resolve.extensionAlias = {
+      '.js': ['.ts', '.tsx', '.js', '.jsx'],
+    };
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      crypto: false,  // use browser's native SubtleCrypto; node path is guarded by typeof window
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

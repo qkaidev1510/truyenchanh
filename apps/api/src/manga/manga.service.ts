@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { MeilisearchService } from 'meilisearch';
+import { MeiliSearch as MeilisearchService } from 'meilisearch';
 import { getPrismaClient } from '../config/database.config.js';
 import type { CreateMangaDto, UpdateMangaDto, MangaQueryDto } from './dto/manga.dto.js';
 import { PAGINATION_DEFAULTS } from '@manga/shared';
@@ -73,7 +73,7 @@ export class MangaService {
   }
 
   async create(dto: CreateMangaDto) {
-    const manga = await this.prisma.manga.create({ data: dto });
+    const manga = await this.prisma.manga.create({ data: { ...dto, coverUrl: dto.coverUrl ?? '' } });
     // Index in Meilisearch
     try {
       const client = this.getMeili() as unknown as import('meilisearch').MeiliSearch;
