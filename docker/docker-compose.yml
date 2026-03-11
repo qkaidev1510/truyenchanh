@@ -1,0 +1,109 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: manga_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-manga}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-manga_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-manga_db}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-manga} -d ${POSTGRES_DB:-manga_db}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - manga_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: manga_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --save 60 1
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - manga_net
+
+  minio:
+    image: minio/minio:latest
+    container_name: manga_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    networks:
+      - manga_net
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.6
+    container_name: manga_meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-masterKey123}
+      MEILI_ENV: development
+    ports:
+      - '7700:7700'
+    volumes:
+      - meili_data:/meili_data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:7700/health']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    networks:
+      - manga_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: manga_nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - meilisearch
+    networks:
+      - manga_net
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  meili_data:
+
+networks:
+  manga_net:
+    driver: bridge

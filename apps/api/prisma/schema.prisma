@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_READ_URL")
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum MangaStatus {
+  ONGOING
+  COMPLETED
+  HIATUS
+  CANCELLED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  totpSecret   String?
+  totpEnabled  Boolean   @default(false)
+  role         UserRole  @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions Session[]
+  comments Comment[]
+
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Manga {
+  id          String      @id @default(uuid())
+  slug        String      @unique
+  title       String
+  description String      @db.Text
+  coverUrl    String
+  status      MangaStatus @default(ONGOING)
+  viewCount   BigInt      @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  chapters Chapter[]
+  comments Comment[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([viewCount])
+}
+
+model Chapter {
+  id         String   @id @default(uuid())
+  mangaId    String
+  number     Float
+  slug       String
+  title      String
+  pagesCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  manga Manga  @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+  pages Page[]
+
+  @@unique([mangaId, slug])
+  @@index([mangaId])
+  @@index([number])
+}
+
+model Page {
+  id               String  @id @default(uuid())
+  chapterId        String
+  pageNumber       Int
+  storageKey       String
+  scrambleMetadata Json?
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([chapterId, pageNumber])
+  @@index([chapterId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  mangaId   String
+  userId    String
+  parentId  String?
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  manga   Manga    @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([mangaId])
+  @@index([userId])
+  @@index([parentId])
+}
