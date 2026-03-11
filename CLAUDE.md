@@ -34,6 +34,13 @@ pnpm typecheck        # TypeScript type checking
 
 Initial setup: `bash scripts/setup.sh` (copies .env, starts Docker, installs deps, runs migrations, seeds data).
 
+Before starting the dev servers, ensure workspace packages are built:
+```bash
+pnpm --filter @manga/shared build
+pnpm --filter @manga/ui build
+pnpm --filter @manga/api exec prisma generate --schema=./prisma/schema.prisma
+```
+
 ## Monorepo Structure
 
 ```
@@ -102,6 +109,15 @@ Pages are tile-scrambled server-side. The web reader uses `ImageBitmap → Canva
 ## Database Schema
 
 Core models in `apps/api/prisma/schema.prisma`: `User` (with TOTP secret, role), `Manga` (status enum), `Chapter`, `Page` (scramble metadata as JSON), `Comment` (nested, cursor-paginated), `Session`.
+
+## Known Gotchas
+
+- **`@manga/shared` must be built before running the API or web** — it has no watch mode wired into `pnpm dev`. Run `pnpm --filter @manga/shared build` after any changes to `packages/shared/src/`.
+- **`@manga/ui` must be built before running the web** — same reason.
+- **`next.config` must be `.mjs`** — Next.js 14.2 does not support `next.config.ts`.
+- **`prisma/seed.ts` is excluded from the API's `tsconfig.json`** — it has its own compilation context. Do not re-add it to `include`.
+- **`packages/shared` exports both `require` and `import`** — needed because the API uses CommonJS and the web uses ESM.
+- **`crypto` not `node:crypto`** — use plain `crypto` in `@manga/shared` so webpack can handle it in the browser bundle.
 
 ## Environment
 
