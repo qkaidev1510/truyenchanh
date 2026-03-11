@@ -98,11 +98,30 @@ services:
     networks:
       - manga_net
 
+  nginx-ui:
+    image: uozi/nginx-ui:latest
+    container_name: manga_nginx_ui
+    restart: unless-stopped
+    environment:
+      NGINX_UI_OFFICIAL_USERNAME: ${NGINX_UI_USERNAME:-admin}
+      NGINX_UI_OFFICIAL_PASSWORD: ${NGINX_UI_PASSWORD:-admin}
+    ports:
+      - '${NGINX_UI_PORT:-8080}:9000'
+    volumes:
+      - ./nginx:/etc/nginx:rw
+      - nginx_ui_data:/etc/nginx-ui
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx
+    networks:
+      - manga_net
+
 volumes:
   postgres_data:
   redis_data:
   minio_data:
   meili_data:
+  nginx_ui_data:
 
 networks:
   manga_net:
