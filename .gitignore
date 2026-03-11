@@ -8,6 +8,7 @@ dist
 build
 .next
 out
+apps/web/next-env.d.ts
 
 # Environment
 .env
@@ -41,6 +42,10 @@ coverage
 
 # Prisma
 apps/api/prisma/migrations/*.sql.backup
+apps/api/prisma/*.js
+apps/api/prisma/*.js.map
+apps/api/prisma/*.d.ts
+apps/api/prisma/*.d.ts.map
 
 .vscode
 .husky
