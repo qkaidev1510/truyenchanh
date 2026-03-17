@@ -6,8 +6,10 @@ export default defineConfig({
   migrate: {
     async adapter(env) {
       const { Pool } = await import('pg');
+      // Use DATABASE_DIRECT_URL for migrations so they bypass PgBouncer.
+      // DDL (CREATE TABLE, ALTER, etc.) requires a persistent session connection.
       const pool = new Pool({
-        connectionString: env['DATABASE_URL'] as string,
+        connectionString: (env['DATABASE_DIRECT_URL'] ?? env['DATABASE_URL']) as string,
       });
       return new PrismaPg(pool);
     },

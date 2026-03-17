@@ -4,11 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  // url is used at runtime (points to PgBouncer)
-  url       = env("DATABASE_URL")
-  // directUrl bypasses PgBouncer for migrations (DDL requires a direct session)
-  directUrl = env("DATABASE_DIRECT_URL")
+  provider = "postgresql"
 }
 
 enum UserRole {
