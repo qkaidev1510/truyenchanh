@@ -1,14 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MeiliSearch as MeilisearchService } from 'meilisearch';
 import { PrismaService } from '../prisma/prisma.service';
+import { CacheService } from '../cache/cache.service';
 import type { CreateMangaDto, UpdateMangaDto, MangaQueryDto } from './dto/manga.dto';
-import { PAGINATION_DEFAULTS } from '@manga/shared';
+import { PAGINATION_DEFAULTS, REDIS_KEYS, CACHE_TTL } from '@manga/shared';
 
 @Injectable()
 export class MangaService {
   private meili: InstanceType<typeof MeilisearchService> | null = null;
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cache: CacheService,
+  ) {}
 
   private getMeili() {
     if (!this.meili) {
@@ -63,11 +67,19 @@ export class MangaService {
   }
 
   async findBySlug(slug: string) {
+    const key = REDIS_KEYS.cache.manga(slug);
+    const cached = await this.cache.get<Awaited<ReturnType<typeof this._fetchBySlug>>>(key);
+    if (cached) return cached;
+
+    const manga = await this._fetchBySlug(slug);
+    await this.cache.set(key, manga, CACHE_TTL.MANGA);
+    return manga;
+  }
+
+  private async _fetchBySlug(slug: string) {
     const manga = await this.prisma.manga.findUnique({
       where: { slug },
-      include: {
-        chapters: { orderBy: { number: 'asc' } },
-      },
+      include: { chapters: { orderBy: { number: 'asc' } } },
     });
     if (!manga) throw new NotFoundException('Manga not found');
     return manga;
@@ -88,6 +100,7 @@ export class MangaService {
       where: { slug },
       data: dto,
     });
+    await this.cache.del(REDIS_KEYS.cache.manga(slug));
     try {
       const client = this.getMeili() as unknown as import('meilisearch').MeiliSearch;
       await client.index('manga').updateDocuments([{ ...manga, id: manga.id }]);

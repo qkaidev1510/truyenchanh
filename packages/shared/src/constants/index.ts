@@ -41,6 +41,11 @@ export const QUEUE_NAMES = {
 
 export const MAX_COMMENT_DEPTH = 2;
 
+export const CACHE_TTL = {
+  MANGA: 300,    // 5 minutes — individual manga + chapter list
+  CHAPTER: 300,  // 5 minutes — chapter with pages
+} as const;
+
 export const REDIS_KEYS = {
   // Rate limiting — sliding window counter per IP
   rateLimit: (ip: string) => `tc:rl:${ip}`,
