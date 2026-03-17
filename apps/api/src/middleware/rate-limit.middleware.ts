@@ -1,6 +1,7 @@
 import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
 import type { Request, Response, NextFunction } from 'express';
 import { getRedisClient } from '../config/redis.config';
+import { REDIS_KEYS } from '@manga/shared';
 
 const WINDOW_SECONDS = 60;
 const MAX_REQUESTS = 120;
@@ -13,7 +14,7 @@ export class RateLimitMiddleware implements NestMiddleware {
     }
 
     const ip = req.ip ?? req.socket.remoteAddress ?? 'unknown';
-    const key = `rl:${ip}`;
+    const key = REDIS_KEYS.rateLimit(ip);
     const redis = getRedisClient();
 
     const multi = redis.multi();

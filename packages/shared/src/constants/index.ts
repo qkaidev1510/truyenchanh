@@ -41,6 +41,16 @@ export const QUEUE_NAMES = {
 
 export const MAX_COMMENT_DEPTH = 2;
 
+export const REDIS_KEYS = {
+  // Rate limiting — sliding window counter per IP
+  rateLimit: (ip: string) => `tc:rl:${ip}`,
+  // Application cache
+  cache: {
+    manga: (slug: string) => `tc:cache:manga:${slug}`,
+    chapter: (id: string) => `tc:cache:chapter:${id}`,
+  },
+} as const;
+
 export const READER = {
   PRELOAD_AHEAD: 2,
   VIRTUAL_WINDOW_SIZE: 7,
