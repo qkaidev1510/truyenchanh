@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { getPrismaClient } from '../config/database.config';
+import { PrismaService } from '../prisma/prisma.service';
 import { MAX_COMMENT_DEPTH, PAGINATION_DEFAULTS } from '@manga/shared';
 
 export interface CreateCommentDto {
@@ -9,7 +9,7 @@ export interface CreateCommentDto {
 
 @Injectable()
 export class CommentService {
-  private prisma = getPrismaClient();
+  constructor(private prisma: PrismaService) {}
 
   async findByManga(
     mangaSlug: string,

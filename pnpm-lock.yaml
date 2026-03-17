@@ -74,6 +74,9 @@ importers:
       '@prisma/client':
         specifier: ^7.5.0
         version: 7.5.0(prisma@7.5.0)(typescript@5.9.3)
+      '@prisma/extension-read-replicas':
+        specifier: ^0.5.0
+        version: 0.5.0(@prisma/client@7.5.0)
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -1239,6 +1242,14 @@ packages:
       '@prisma/engines-version': 7.5.0-15.280c870be64f457428992c43c1f6d557fab6e29e
       '@prisma/fetch-engine': 7.5.0
       '@prisma/get-platform': 7.5.0
+
+  /@prisma/extension-read-replicas@0.5.0(@prisma/client@7.5.0):
+    resolution: {integrity: sha512-t0kLjqFMte4wwGrZFhya4iFoyoOY4kjlyyE60WXZL66PqP6PcBpW/35eKb/3UcxgjJxcDlaJKfmGokFLOyafiQ==}
+    peerDependencies:
+      '@prisma/client': ^7.0.0
+    dependencies:
+      '@prisma/client': 7.5.0(prisma@7.5.0)(typescript@5.9.3)
+    dev: false
 
   /@prisma/fetch-engine@7.5.0:
     resolution: {integrity: sha512-kZCl2FV54qnyrVdnII8MI6qvt7HfU6Cbiz8dZ8PXz4f4lbSw45jEB9/gEMK2SGdiNhBKyk/Wv95uthoLhGMLYA==}

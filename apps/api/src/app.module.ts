@@ -10,10 +10,12 @@ import { ImageModule } from './image/image.module';
 import { StorageModule } from './storage/storage.module';
 import { SignatureMiddleware } from './middleware/signature.middleware';
 import { RateLimitMiddleware } from './middleware/rate-limit.middleware';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
     AuthModule,
     UserModule,
     MangaModule,

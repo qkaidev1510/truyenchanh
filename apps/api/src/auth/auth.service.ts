@@ -2,14 +2,15 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import * as OTPAuth from 'otpauth';
-import { getPrismaClient } from '../config/database.config';
+import { PrismaService } from '../prisma/prisma.service';
 import type { LoginDto, RegisterDto, TotpVerifyDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-  private prisma = getPrismaClient();
-
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
   async register(dto: RegisterDto) {
     const exists = await this.prisma.user.findUnique({ where: { email: dto.email } });

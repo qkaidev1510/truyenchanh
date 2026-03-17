@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MeiliSearch as MeilisearchService } from 'meilisearch';
-import { getPrismaClient } from '../config/database.config';
+import { PrismaService } from '../prisma/prisma.service';
 import type { CreateMangaDto, UpdateMangaDto, MangaQueryDto } from './dto/manga.dto';
 import { PAGINATION_DEFAULTS } from '@manga/shared';
 
 @Injectable()
 export class MangaService {
-  private prisma = getPrismaClient();
   private meili: InstanceType<typeof MeilisearchService> | null = null;
+
+  constructor(private prisma: PrismaService) {}
 
   private getMeili() {
     if (!this.meili) {

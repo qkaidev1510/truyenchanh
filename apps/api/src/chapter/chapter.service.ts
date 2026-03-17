@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { getPrismaClient } from '../config/database.config';
+import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { SIGNED_URL_EXPIRY_SECONDS } from '@manga/shared';
 
 @Injectable()
 export class ChapterService {
-  private prisma = getPrismaClient();
-
-  constructor(private storageService: StorageService) {}
+  constructor(
+    private prisma: PrismaService,
+    private storageService: StorageService,
+  ) {}
 
   async findByManga(mangaSlug: string) {
     const manga = await this.prisma.manga.findUnique({ where: { slug: mangaSlug } });
