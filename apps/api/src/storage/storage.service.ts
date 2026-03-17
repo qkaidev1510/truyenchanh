@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { getMinioClient, BUCKET_IMAGES } from '../config/minio.config.js';
+import { getMinioClient, BUCKET_IMAGES } from '../config/minio.config';
 import type { BucketItemStat } from 'minio';
 
 @Injectable()

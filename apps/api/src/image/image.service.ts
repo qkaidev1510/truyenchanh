@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { imageProcessQueue, type ImageProcessJobData } from './image.queue.js';
+import { imageProcessQueue, type ImageProcessJobData } from './image.queue';
 
 @Injectable()
 export class ImageService {

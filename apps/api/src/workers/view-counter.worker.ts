@@ -3,10 +3,10 @@
  */
 
 import { Worker } from 'bullmq';
-import { getBullConnection } from '../config/bull.config.js';
-import { getPrismaClient } from '../config/database.config.js';
+import { getBullConnection } from '../config/bull.config';
+import { getPrismaClient } from '../config/database.config';
 import { QUEUE_NAMES } from '@manga/shared';
-import type { ViewCountJobData } from '../image/image.queue.js';
+import type { ViewCountJobData } from '../image/image.queue';
 
 const prisma = getPrismaClient();
 

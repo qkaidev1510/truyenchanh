@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, Body, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { CommentService } from './comment.service.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { CommentService } from './comment.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { IsString, IsOptional } from 'class-validator';
 
 class CreateCommentDto {

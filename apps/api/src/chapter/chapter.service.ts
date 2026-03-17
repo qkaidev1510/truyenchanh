@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { getPrismaClient } from '../config/database.config.js';
-import { StorageService } from '../storage/storage.service.js';
+import { getPrismaClient } from '../config/database.config';
+import { StorageService } from '../storage/storage.service';
 import { SIGNED_URL_EXPIRY_SECONDS } from '@manga/shared';
 
 @Injectable()

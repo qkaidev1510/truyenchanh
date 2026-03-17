@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import { getBullConnection } from '../config/bull.config.js';
+import { getBullConnection } from '../config/bull.config';
 import { QUEUE_NAMES } from '@manga/shared';
 
 export const imageProcessQueue = new Queue(QUEUE_NAMES.IMAGE_PROCESS, {

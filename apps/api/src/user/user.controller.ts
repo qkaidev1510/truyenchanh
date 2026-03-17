@@ -1,7 +1,7 @@
 import { Controller, Get, Patch, Body, UseGuards, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserService } from './user.service.js';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { UserService } from './user.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { IsEmail, IsOptional } from 'class-validator';
 
 class UpdateProfileDto {

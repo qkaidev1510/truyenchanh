@@ -35,6 +35,7 @@ pnpm typecheck        # TypeScript type checking
 Initial setup: `bash scripts/setup.sh` (copies .env, starts Docker, installs deps, runs migrations, seeds data).
 
 Before starting the dev servers, ensure workspace packages are built:
+
 ```bash
 pnpm --filter @manga/shared build
 pnpm --filter @manga/ui build
@@ -92,19 +93,19 @@ Pages are tile-scrambled server-side. The web reader uses `ImageBitmap → Canva
 
 ## Key Technologies
 
-| Layer | Technology |
-|---|---|
-| Backend framework | NestJS 10 |
-| ORM | Prisma 5 + PostgreSQL 16 |
-| Auth | Passport + JWT + OTPAuth (TOTP) |
-| Queue | BullMQ on Redis 7 |
-| Storage | MinIO (S3-compatible) |
-| Search | Meilisearch |
-| Image processing | Sharp |
-| Frontend framework | Next.js 14 (App Router) |
-| State management | Zustand |
-| Data fetching | SWR + Axios |
-| Styling | Tailwind CSS 3 |
+| Layer              | Technology                      |
+| ------------------ | ------------------------------- |
+| Backend framework  | NestJS 10                       |
+| ORM                | Prisma 5 + PostgreSQL 16        |
+| Auth               | Passport + JWT + OTPAuth (TOTP) |
+| Queue              | BullMQ on Redis 7               |
+| Storage            | MinIO (S3-compatible)           |
+| Search             | Meilisearch                     |
+| Image processing   | Sharp                           |
+| Frontend framework | Next.js 14 (App Router)         |
+| State management   | Zustand                         |
+| Data fetching      | SWR + Axios                     |
+| Styling            | Tailwind CSS 3                  |
 
 ## Database Schema
 

@@ -5,13 +5,13 @@
  */
 
 import { Worker } from 'bullmq';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/prisma/client';
 import sharp from 'sharp';
-import { getBullConnection } from '../config/bull.config.js';
-import { getMinioClient, BUCKET_IMAGES } from '../config/minio.config.js';
-import { getPrismaClient } from '../config/database.config.js';
+import { getBullConnection } from '../config/bull.config';
+import { getMinioClient, BUCKET_IMAGES } from '../config/minio.config';
+import { getPrismaClient } from '../config/database.config';
 import { QUEUE_NAMES } from '@manga/shared';
-import type { ImageProcessJobData } from './image.queue.js';
+import type { ImageProcessJobData } from './image.queue';
 
 const prisma = getPrismaClient();
 const minio = getMinioClient();

@@ -46,6 +46,10 @@ apps/api/prisma/*.js
 apps/api/prisma/*.js.map
 apps/api/prisma/*.d.ts
 apps/api/prisma/*.d.ts.map
+apps/api/src/generated/
+
+# Claude Code
+.claude/
 
 .vscode
 .husky

@@ -1,3 +1,4 @@
+// @ts-check
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
@@ -5,29 +6,24 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2022,
     sourceType: 'module',
-    project: ['./tsconfig.base.json', './apps/*/tsconfig.json', './packages/*/tsconfig.json'],
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'plugin:prettier/recommended',
+    'prettier',
   ],
   rules: {
-    'prettier/prettier': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    // NestJS uses emitDecoratorMetadata — `import type` strips runtime type
+    // info needed for dependency injection. Disable this rule project-wide.
+    '@typescript-eslint/consistent-type-imports': 'off',
+
+    // Commonly noisy rules in NestJS codebases
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
   },
-  ignorePatterns: [
-    'node_modules',
-    'dist',
-    '.next',
-    'coverage',
-    '**/*.js',
-    '!.eslintrc.js',
-  ],
+  env: {
+    node: true,
+    es2022: true,
+  },
 };

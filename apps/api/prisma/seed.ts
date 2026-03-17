@@ -100,9 +100,7 @@ async function main() {
             pageNumber: p,
             storageKey: `${manga.slug}/${chapter.slug}/page-${String(p).padStart(3, '0')}.webp`,
             scrambleMetadata:
-              p % 3 === 0
-                ? { tileWidth: 4, tileHeight: 4, seed: p * 1337, version: 1 }
-                : null,
+              p % 3 === 0 ? { tileWidth: 4, tileHeight: 4, seed: p * 1337, version: 1 } : null,
           },
         });
       }

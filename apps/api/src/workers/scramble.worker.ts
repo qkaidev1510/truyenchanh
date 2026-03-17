@@ -5,10 +5,10 @@
 
 import { Worker } from 'bullmq';
 import sharp from 'sharp';
-import { getBullConnection } from '../config/bull.config.js';
-import { getMinioClient, BUCKET_IMAGES } from '../config/minio.config.js';
+import { getBullConnection } from '../config/bull.config';
+import { getMinioClient, BUCKET_IMAGES } from '../config/minio.config';
 import { QUEUE_NAMES } from '@manga/shared';
-import type { ScrambleJobData } from '../image/image.queue.js';
+import type { ScrambleJobData } from '../image/image.queue';
 
 const minio = getMinioClient();
 

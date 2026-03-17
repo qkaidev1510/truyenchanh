@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsOptional, IsUrl, MinLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { MangaStatus } from '@prisma/client';
+import { MangaStatus } from '../../generated/prisma/client';
 
 export class CreateMangaDto {
   @ApiProperty()

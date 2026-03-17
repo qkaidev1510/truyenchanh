@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
 import type { Request, Response, NextFunction } from 'express';
-import { getRedisClient } from '../config/redis.config.js';
+import { getRedisClient } from '../config/redis.config';
 
 const WINDOW_SECONDS = 60;
 const MAX_REQUESTS = 120;

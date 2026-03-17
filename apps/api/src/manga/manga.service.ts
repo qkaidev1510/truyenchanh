@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MeiliSearch as MeilisearchService } from 'meilisearch';
-import { getPrismaClient } from '../config/database.config.js';
-import type { CreateMangaDto, UpdateMangaDto, MangaQueryDto } from './dto/manga.dto.js';
+import { getPrismaClient } from '../config/database.config';
+import type { CreateMangaDto, UpdateMangaDto, MangaQueryDto } from './dto/manga.dto';
 import { PAGINATION_DEFAULTS } from '@manga/shared';
 
 @Injectable()

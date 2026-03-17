@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ChapterService } from './chapter.service.js';
-import { ChapterController } from './chapter.controller.js';
-import { StorageModule } from '../storage/storage.module.js';
+import { ChapterService } from './chapter.service';
+import { ChapterController } from './chapter.controller';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
   imports: [StorageModule],

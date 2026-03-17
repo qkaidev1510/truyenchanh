@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ChapterService } from './chapter.service.js';
+import { ChapterService } from './chapter.service';
 
 @ApiTags('chapters')
 @Controller('manga/:mangaSlug/chapters')

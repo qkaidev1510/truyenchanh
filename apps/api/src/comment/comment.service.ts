@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { getPrismaClient } from '../config/database.config.js';
+import { getPrismaClient } from '../config/database.config';
 import { MAX_COMMENT_DEPTH, PAGINATION_DEFAULTS } from '@manga/shared';
 
 export interface CreateCommentDto {

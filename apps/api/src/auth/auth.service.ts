@@ -2,8 +2,8 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import * as OTPAuth from 'otpauth';
-import { getPrismaClient } from '../config/database.config.js';
-import type { LoginDto, RegisterDto, TotpVerifyDto } from './dto/login.dto.js';
+import { getPrismaClient } from '../config/database.config';
+import type { LoginDto, RegisterDto, TotpVerifyDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -75,7 +75,7 @@ export class AuthService {
     return { message: 'TOTP enabled successfully' };
   }
 
-  async refresh(refreshToken: string) {
+  refresh(refreshToken: string) {
     try {
       const payload = this.jwtService.verify<{ sub: string; email: string; role: string }>(
         refreshToken,

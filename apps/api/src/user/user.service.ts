@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { getPrismaClient } from '../config/database.config.js';
+import { getPrismaClient } from '../config/database.config';
 
 @Injectable()
 export class UserService {

@@ -1,14 +1,15 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import type { NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module.js';
-import { UserModule } from './user/user.module.js';
-import { MangaModule } from './manga/manga.module.js';
-import { ChapterModule } from './chapter/chapter.module.js';
-import { CommentModule } from './comment/comment.module.js';
-import { ImageModule } from './image/image.module.js';
-import { StorageModule } from './storage/storage.module.js';
-import { SignatureMiddleware } from './middleware/signature.middleware.js';
-import { RateLimitMiddleware } from './middleware/rate-limit.middleware.js';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { MangaModule } from './manga/manga.module';
+import { ChapterModule } from './chapter/chapter.module';
+import { CommentModule } from './comment/comment.module';
+import { ImageModule } from './image/image.module';
+import { StorageModule } from './storage/storage.module';
+import { SignatureMiddleware } from './middleware/signature.middleware';
+import { RateLimitMiddleware } from './middleware/rate-limit.middleware';
 
 @Module({
   imports: [
@@ -24,8 +25,6 @@ import { RateLimitMiddleware } from './middleware/rate-limit.middleware.js';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RateLimitMiddleware, SignatureMiddleware)
-      .forRoutes('*');
+    consumer.apply(RateLimitMiddleware, SignatureMiddleware).forRoutes('*');
   }
 }
