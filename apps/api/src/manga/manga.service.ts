@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { MeiliSearch as MeilisearchService } from 'meilisearch';
 import { PrismaService } from '../prisma/prisma.service';
 import { CacheService } from '../cache/cache.service';
@@ -12,14 +13,15 @@ export class MangaService {
   constructor(
     private prisma: PrismaService,
     private cache: CacheService,
+    private configService: ConfigService,
   ) {}
 
   private getMeili() {
     if (!this.meili) {
       const { MeiliSearch } = require('meilisearch') as typeof import('meilisearch');
       this.meili = new MeiliSearch({
-        host: process.env['MEILI_HOST'] ?? 'http://localhost:7700',
-        apiKey: process.env['MEILI_MASTER_KEY'],
+        host: this.configService.get<string>('MEILI_HOST', 'http://localhost:7700'),
+        apiKey: this.configService.get<string>('MEILI_MASTER_KEY'),
       }) as unknown as InstanceType<typeof MeilisearchService>;
     }
     return this.meili;

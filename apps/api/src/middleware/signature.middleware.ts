@@ -1,12 +1,15 @@
 import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Request, Response, NextFunction } from 'express';
 import { generateSignature, isTimestampValid, hashIp } from '@manga/shared';
 
 @Injectable()
 export class SignatureMiddleware implements NestMiddleware {
+  constructor(private configService: ConfigService) {}
+
   async use(req: Request, _res: Response, next: NextFunction) {
     // Skip in dev when disabled
-    if (process.env['DISABLE_SIGNATURE_CHECK'] === 'true') {
+    if (this.configService.get<string>('DISABLE_SIGNATURE_CHECK') === 'true') {
       return next();
     }
 
@@ -32,7 +35,7 @@ export class SignatureMiddleware implements NestMiddleware {
     const rawIp = req.ip ?? req.socket.remoteAddress ?? '0.0.0.0';
     const hashedIp = await hashIp(rawIp);
 
-    const secret = process.env['SIGNATURE_SECRET'];
+    const secret = this.configService.get<string>('SIGNATURE_SECRET');
     if (!secret) throw new Error('SIGNATURE_SECRET not configured');
 
     const expected = await generateSignature({ timestamp, userAgent, hashedIp }, secret);

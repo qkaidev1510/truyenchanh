@@ -1,4 +1,5 @@
 import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Request, Response, NextFunction } from 'express';
 import { getRedisClient } from '../config/redis.config';
 import { REDIS_KEYS } from '@manga/shared';
@@ -8,8 +9,10 @@ const MAX_REQUESTS = 120;
 
 @Injectable()
 export class RateLimitMiddleware implements NestMiddleware {
+  constructor(private configService: ConfigService) {}
+
   async use(req: Request, res: Response, next: NextFunction) {
-    if (process.env['DISABLE_RATE_LIMIT'] === 'true') {
+    if (this.configService.get<string>('DISABLE_RATE_LIMIT') === 'true') {
       return next();
     }
 

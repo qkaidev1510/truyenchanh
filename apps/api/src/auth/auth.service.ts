@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import bcrypt from 'bcrypt';
 import * as OTPAuth from 'otpauth';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,6 +11,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -38,7 +40,7 @@ export class AuthService {
   async enableTotp(userId: string) {
     const secret = new OTPAuth.Secret();
     const totp = new OTPAuth.TOTP({
-      issuer: process.env['TOTP_APP_NAME'] ?? 'TruyenChanh',
+      issuer: this.configService.get<string>('TOTP_APP_NAME', 'TruyenChanh'),
       label: userId,
       algorithm: 'SHA1',
       digits: 6,
@@ -80,7 +82,7 @@ export class AuthService {
     try {
       const payload = this.jwtService.verify<{ sub: string; email: string; role: string }>(
         refreshToken,
-        { secret: process.env['JWT_REFRESH_SECRET'] ?? 'refresh_secret' },
+        { secret: this.configService.get<string>('JWT_REFRESH_SECRET', 'refresh_secret') },
       );
       return this.issueTokens(payload.sub, payload.email, payload.role);
     } catch {
@@ -92,8 +94,8 @@ export class AuthService {
     const payload = { sub: userId, email, role };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env['JWT_REFRESH_SECRET'] ?? 'refresh_secret',
-      expiresIn: process.env['JWT_REFRESH_EXPIRES_IN'] ?? '7d',
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET', 'refresh_secret'),
+      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
     });
     return { accessToken, refreshToken };
   }
