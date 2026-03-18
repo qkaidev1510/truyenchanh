@@ -5,7 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { REDIS_KEYS } from '@manga/shared';
 import { CacheService } from '../../cache/cache.service';
 
-export interface JwtPayload {
+interface JwtLogoutPayload {
   sub: string;
   email: string;
   role: string;
@@ -14,19 +14,19 @@ export interface JwtPayload {
 }
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtLogoutStrategy extends PassportStrategy(Strategy, 'jwt-logout') {
   constructor(
     configService: ConfigService,
     private cache: CacheService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
+      ignoreExpiration: true,
       secretOrKey: configService.get<string>('JWT_SECRET', 'dev_secret'),
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtLogoutPayload) {
     if (!payload.sub || !payload.jti) throw new UnauthorizedException();
     const blacklisted = await this.cache.get(REDIS_KEYS.blacklist(payload.jti));
     if (blacklisted) throw new UnauthorizedException('Token has been revoked');

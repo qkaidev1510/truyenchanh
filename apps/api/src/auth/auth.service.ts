@@ -1,9 +1,12 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { createHash, randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 import * as OTPAuth from 'otpauth';
 import { PrismaService } from '../prisma/prisma.service';
+import { CacheService } from '../cache/cache.service';
+import { REDIS_KEYS } from '@manga/shared';
 import type { LoginDto, RegisterDto, TotpVerifyDto } from './dto/login.dto';
 
 @Injectable()
@@ -12,6 +15,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private cache: CacheService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -34,7 +38,20 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
 
-    return this.issueTokens(user.id, user.email, user.role);
+    const { accessToken, refreshToken } = this.issueTokens(user.id, user.email, user.role);
+
+    const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+    await this.prisma.session.create({
+      data: { userId: user.id, tokenHash, expiresAt },
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: { id: user.id, email: user.email, role: user.role },
+    };
   }
 
   async enableTotp(userId: string) {
@@ -78,22 +95,46 @@ export class AuthService {
     return { message: 'TOTP enabled successfully' };
   }
 
-  refresh(refreshToken: string) {
-    try {
-      const payload = this.jwtService.verify<{ sub: string; email: string; role: string }>(
-        refreshToken,
-        { secret: this.configService.get<string>('JWT_REFRESH_SECRET', 'refresh_secret') },
-      );
-      return this.issueTokens(payload.sub, payload.email, payload.role);
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
+  async refresh(sub: string, rawRefreshToken: string) {
+    const tokenHash = createHash('sha256').update(rawRefreshToken).digest('hex');
+
+    const session = await this.prisma.session.findUnique({ where: { tokenHash } });
+    if (!session || session.expiresAt < new Date()) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: sub } });
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const { accessToken, refreshToken: newRefreshToken } = this.issueTokens(user.id, user.email, user.role);
+
+    const newTokenHash = createHash('sha256').update(newRefreshToken).digest('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+    await this.prisma.session.update({
+      where: { tokenHash },
+      data: { tokenHash: newTokenHash, expiresAt },
+    });
+
+    return { accessToken, refreshToken: newRefreshToken };
+  }
+
+  async logout(jti: string, exp: number, refreshToken: string | undefined) {
+    const ttl = exp - Math.floor(Date.now() / 1000);
+    if (ttl > 0) {
+      await this.cache.set(REDIS_KEYS.blacklist(jti), '1', ttl);
+    }
+
+    if (refreshToken) {
+      const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
+      await this.prisma.session.deleteMany({ where: { tokenHash } });
     }
   }
 
   private issueTokens(userId: string, email: string, role: string) {
-    const payload = { sub: userId, email, role };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
+    const jti = randomUUID();
+    const accessToken = this.jwtService.sign({ sub: userId, email, role, jti });
+    const refreshToken = this.jwtService.sign({ sub: userId, email, role }, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET', 'refresh_secret'),
       expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
     });

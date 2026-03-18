@@ -54,6 +54,8 @@ export const REDIS_KEYS = {
     manga: (slug: string) => `tc:cache:manga:${slug}`,
     chapter: (id: string) => `tc:cache:chapter:${id}`,
   },
+  // Access token blacklist (for logout)
+  blacklist: (jti: string) => `tc:bl:${jti}`,
 } as const;
 
 export const READER = {
